@@ -342,6 +342,8 @@ const RegisterDialog = () => {
     setIsLoading(true);
     
     try {
+      console.log("Starting registration with:", { username, displayName });
+      
       // Register the user
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -355,10 +357,15 @@ const RegisterDialog = () => {
         }),
       });
       
+      // Get response details for better error handling
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
+        console.error("Registration response not OK:", response.status, responseData);
+        throw new Error(responseData.message || "Registration failed");
       }
+      
+      console.log("Registration successful, logging in...");
       
       // Log in automatically after registration
       await login(username, password);

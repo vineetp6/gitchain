@@ -111,6 +111,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
       });
       
+      console.log("Generated key pair successfully");
+      
       // Add publicKey and privateKey to the request body
       const fullUserData = {
         ...req.body,
@@ -118,30 +120,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         privateKey
       };
       
-      // Validate with schema
-      const userData = insertUserSchema.parse(fullUserData);
+      console.log("Full user data prepared (excluding sensitive data)");
       
-      // Hash password
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      
-      const newUser = await storage.createUser({
-        ...userData,
-        password: hashedPassword,
-      });
+      try {
+        // Validate with schema
+        const userData = insertUserSchema.parse(fullUserData);
+        console.log("Schema validation passed");
+        
+        // Hash password
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        console.log("Password hashed successfully");
+        
+        // Create the user
+        const newUser = await storage.createUser({
+          ...userData,
+          password: hashedPassword,
+        });
+        console.log("User created successfully with ID:", newUser.id);
 
-      // Remove sensitive data
-      const { password, privateKey: pk, ...safeUser } = newUser;
-      
-      res.status(201).json(safeUser);
+        // Remove sensitive data
+        const { password, privateKey: pk, ...safeUser } = newUser;
+        
+        res.status(201).json(safeUser);
+      } catch (validationError) {
+        console.error("Validation or user creation error:", validationError);
+        throw validationError;
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("ZodError details:", JSON.stringify(error.errors));
         return res.status(400).json({ 
           message: "Validation error", 
           errors: error.errors 
         });
       }
       console.error("Error registering user:", error);
-      res.status(500).json({ message: "Internal server error during registration" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ message: "Internal server error during registration", error: errorMessage });
     }
   });
 
