@@ -123,7 +123,12 @@ const UnauthenticatedHome = () => {
         <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
           Create an account to start hosting repositories, collaborating with others, and contributing to the decentralized code ecosystem.
         </p>
-        <Button size="lg">Get Started</Button>
+        <Button size="lg" onClick={() => {
+          const registerButton = document.querySelector('button:has(span:contains("Sign up"))');
+          if (registerButton instanceof HTMLElement) {
+            registerButton.click();
+          }
+        }}>Get Started</Button>
       </div>
     </div>
   );
