@@ -7,6 +7,15 @@ import Home from "@/pages/Home";
 import Repository from "@/pages/Repository";
 import Discover from "@/pages/Discover";
 import Profile from "@/pages/Profile";
+import Documentation from "@/pages/Documentation";
+import ApiReference from "@/pages/ApiReference";
+import GitReference from "@/pages/GitReference";
+import P2PGuide from "@/pages/P2PGuide";
+import CryptoBasics from "@/pages/CryptoBasics";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import NetworkStatus from "@/pages/NetworkStatus";
+import Contact from "@/pages/Contact";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useEffect, useState } from "react";
@@ -44,6 +53,21 @@ function Router() {
       <Route path="/repository/:id" component={Repository} />
       <Route path="/discover" component={Discover} />
       <Route path="/profile/:username" component={Profile} />
+      
+      {/* Documentation pages */}
+      <Route path="/docs" component={Documentation} />
+      <Route path="/api-reference" component={ApiReference} />
+      <Route path="/git-reference" component={GitReference} />
+      <Route path="/p2p-guide" component={P2PGuide} />
+      <Route path="/crypto-basics" component={CryptoBasics} />
+      
+      {/* About pages */}
+      <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/network" component={NetworkStatus} />
+      <Route path="/contact" component={Contact} />
+      
+      {/* 404 page - must be last */}
       <Route component={NotFound} />
     </Switch>
   );
