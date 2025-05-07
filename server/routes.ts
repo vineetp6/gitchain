@@ -102,7 +102,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post(`${apiPrefix}/auth/register`, async (req, res) => {
     try {
-      const userData = insertUserSchema.parse(req.body);
+      console.log("Registration request body:", req.body);
+      
+      // Generate key pair for cryptographic operations
+      const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        publicKeyEncoding: { type: 'spki', format: 'pem' },
+        privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+      });
+      
+      // Add publicKey and privateKey to the request body
+      const fullUserData = {
+        ...req.body,
+        publicKey,
+        privateKey
+      };
+      
+      // Validate with schema
+      const userData = insertUserSchema.parse(fullUserData);
       
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -113,15 +130,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Remove sensitive data
-      const { password, privateKey, ...safeUser } = newUser;
+      const { password, privateKey: pk, ...safeUser } = newUser;
       
       res.status(201).json(safeUser);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ errors: error.errors });
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
+        });
       }
       console.error("Error registering user:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error during registration" });
     }
   });
 
