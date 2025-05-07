@@ -16,4 +16,3 @@
 
 # Best option which I used:
  ### Inline env-var in npm script.Use this command on Powershell to run the App:: $env:DATABASE_URL="postgres://..." ; npm run dev
- ### Inline env-var in npm script.Use this command on CMD prompt to run the App: set DATABASE_URL=postgres://...&& npm run dev
